@@ -196,4 +196,39 @@ class FaturaServiceTest {
         verify(clienteRepository, never()).save(any(Cliente.class));
         verify(faturaRepository, never()).save(any(Fatura.class));
     }
+
+    @Test
+    void deveLancarExcecaoQuandoFaturaRequestDTOInvalido() {
+        FaturaRequestDTO dtoInvalido = new FaturaRequestDTO(null, LocalDate.of(2025, 7, 15), BigDecimal.valueOf(150.00));
+        FaturaRequestDTO finalDtoInvalido = dtoInvalido;
+        assertThrows(IllegalArgumentException.class, () -> faturaService.create(finalDtoInvalido),
+                "Deve lançar exceção para clienteId nulo");
+
+        dtoInvalido = new FaturaRequestDTO(1L, LocalDate.of(2025, 7, 15), BigDecimal.valueOf(-150.00));
+        FaturaRequestDTO finalDtoInvalido1 = dtoInvalido;
+        assertThrows(IllegalArgumentException.class, () -> faturaService.create(finalDtoInvalido1),
+                "Deve lançar exceção para valor negativo");
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoRepositorioFalhaAoSalvar() {
+        when(clienteRepository.findById(1L)).thenReturn(Optional.of(cliente));
+        when(faturaRepository.save(any(Fatura.class))).thenThrow(new RuntimeException("Erro no banco"));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> faturaService.create(faturaRequestDTO));
+        assertThat(exception.getMessage()).isEqualTo("Erro no banco");
+        verify(faturaRepository).save(any(Fatura.class));
+    }
+
+    @Test
+    void deveIgnorarFaturasComMenosDeTresDiasDeAtraso() {
+        fatura.setDataVencimento(LocalDate.now().minusDays(2));
+        when(faturaRepository.findFaturasAtrasadas(any(LocalDate.class))).thenReturn(List.of());
+
+        List<FaturaResponseDTO> result = faturaService.findFaturasAtrasadas();
+
+        assertThat(result).isEmpty();
+        verify(faturaRepository).findFaturasAtrasadas(LocalDate.now().minusDays(3));
+        verify(clienteRepository, never()).save(any(Cliente.class));
+    }
 }

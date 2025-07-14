@@ -156,4 +156,21 @@ class ClienteServiceTest {
         assertThat(bloqueados).isEmpty();
         verify(clienteRepository).findByStatusBloqueio(StatusBloqueio.B);
     }
+
+    @Test
+    void deveLancarExcecaoParaCPFInvalido() {
+        ClienteRequestDTO dtoInvalido = new ClienteRequestDTO("Lis", "123", LocalDate.of(1998, 10, 15), BigDecimal.valueOf(2000.00));
+        assertThrows(NullPointerException.class, () -> clienteService.create(dtoInvalido),
+                "Deve lançar exceção para CPF inválido");
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoRepositorioFalhaAoSalvarCliente() {
+        ClienteRequestDTO dto = new ClienteRequestDTO("Lis", "12345678900", LocalDate.of(1998, 10, 15), BigDecimal.valueOf(2000.00));
+        when(clienteRepository.save(any(Cliente.class))).thenThrow(new RuntimeException("Erro no banco"));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> clienteService.create(dto));
+        assertThat(exception.getMessage()).isEqualTo("Erro no banco");
+        verify(clienteRepository).save(any(Cliente.class));
+    }
 }

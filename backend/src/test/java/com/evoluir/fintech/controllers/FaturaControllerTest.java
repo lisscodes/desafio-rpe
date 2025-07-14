@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -93,6 +94,34 @@ class FaturaControllerTest {
         when(faturaService.registrarPagamento(99L)).thenThrow(new RuntimeException("Fatura não encontrada"));
 
         mockMvc.perform(put("/faturas/99/pagamento"))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deveRetornar400ParaFaturaRequestInvalida() throws Exception {
+        String jsonInvalido = """
+        {
+          "clienteId": null,
+          "dataVencimento": "2025-08-15",
+          "valor": -150.00
+        }
+        """;
+
+        mockMvc.perform(post("/faturas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonInvalido))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Validation Error"));
+    }
+
+    @Test
+    void deveRetornar400ParaJsonMalformado() throws Exception {
+        String jsonMalformado = "{ \"clienteId\": 1, \"dataVencimento\": \"2025-08-15\", \"valor\": ";
+
+        mockMvc.perform(post("/faturas")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonMalformado))
                 .andExpect(status().isNotFound());
     }
 }

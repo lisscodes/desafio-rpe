@@ -189,4 +189,26 @@ class ClienteControllerTest {
         assertNotNull(dto.limiteCredito());
     }
 
+    @Test
+    void deveRetornar400ParaClienteRequestInvalido() throws Exception {
+        String jsonInvalido = """
+        {
+          "nome": "",
+          "cpf": "123",
+          "dataNascimento": "2026-01-01",
+          "limiteCredito": -1000.0
+        }
+        """;
+
+        mockMvc.perform(post("/clientes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonInvalido))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Validation Error"))
+                .andExpect(jsonPath("$.details.nome").value("Nome é obrigatório"))
+                .andExpect(jsonPath("$.details.cpf").value("CPF deve conter 11 dígitos numéricos"))
+                .andExpect(jsonPath("$.details.dataNascimento").value("Data de nascimento deve ser no passado"))
+                .andExpect(jsonPath("$.details.limiteCredito").value("Limite de crédito deve ser maior ou igual a zero"));
+    }
 }
