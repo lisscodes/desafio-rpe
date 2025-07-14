@@ -1,8 +1,7 @@
 package com.evoluir.fintech.domain.entities;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -11,6 +10,7 @@ import java.time.LocalDate;
 @Getter
 @Entity
 @Table(name = "clientes")
+@NoArgsConstructor
 public class Cliente {
 
     @Id
@@ -31,8 +31,6 @@ public class Cliente {
 
     @Column(name = "limite_credito")
     private BigDecimal limiteCredito;
-
-    public Cliente() {}
 
     public Cliente(String nome, String cpf, LocalDate dataNascimento, StatusBloqueio statusBloqueio, BigDecimal limiteCredito) {
         this.nome = nome;

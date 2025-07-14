@@ -54,10 +54,8 @@ public class FaturaService {
     public FaturaResponseDTO registrarPagamento(Long faturaId) {
         Fatura fatura = faturaRepository.findById(faturaId)
                 .orElseThrow(() -> new RuntimeException("Fatura não encontrada"));
-
         fatura.setDataPagamento(LocalDate.now());
         fatura.setStatus(StatusFatura.P);
-
         return toDTO(faturaRepository.save(fatura));
     }
 
@@ -65,12 +63,14 @@ public class FaturaService {
         List<Fatura> atrasadas = faturaRepository.findFaturasAtrasadas(LocalDate.now().minusDays(3));
 
         atrasadas.forEach(fatura -> {
+            fatura.setStatus(StatusFatura.A);
             Cliente cliente = fatura.getCliente();
             if (cliente.getStatusBloqueio() != StatusBloqueio.B) {
                 cliente.setStatusBloqueio(StatusBloqueio.B);
                 cliente.setLimiteCredito(BigDecimal.ZERO);
                 clienteRepository.save(cliente);
             }
+            faturaRepository.save(fatura);
         });
 
         return atrasadas.stream()

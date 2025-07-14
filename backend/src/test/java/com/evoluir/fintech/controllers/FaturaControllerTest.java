@@ -70,16 +70,8 @@ class FaturaControllerTest {
     @Test
     void deveRegistrarPagamentoDaFatura() throws Exception {
         FaturaResponseDTO faturaPaga = new FaturaResponseDTO(
-                1L,
-                1L,
-                LocalDate.of(2024, 7, 15),
-                LocalDate.now(),
-                new BigDecimal("150.00"),
-                StatusFatura.P
-        );
-
+                1L, 1L, LocalDate.of(2024, 7, 15), LocalDate.now(), BigDecimal.valueOf(150.00), StatusFatura.P);
         when(faturaService.registrarPagamento(1L)).thenReturn(faturaPaga);
-
         mockMvc.perform(put("/faturas/1/pagamento"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("P"))

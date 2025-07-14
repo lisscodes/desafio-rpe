@@ -7,7 +7,6 @@ import com.evoluir.fintech.domain.entities.StatusBloqueio;
 import com.evoluir.fintech.repositories.ClienteRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,6 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class ClienteServiceTest {
@@ -43,6 +43,10 @@ class ClienteServiceTest {
         assertThat(response).isNotNull();
         assertThat(response.statusBloqueio()).isEqualTo(StatusBloqueio.A);
         assertThat(response.nome()).isEqualTo("Lis");
+        assertThat(response.cpf()).isEqualTo("12345678900");
+        assertThat(response.dataNascimento()).isEqualTo(LocalDate.of(1998, 10, 15));
+        assertThat(response.limiteCredito()).isEqualTo(BigDecimal.valueOf(2000.00));
+        verify(clienteRepository).save(any(Cliente.class));
     }
 
     @Test
@@ -56,6 +60,19 @@ class ClienteServiceTest {
 
         assertThat(resultado).isPresent();
         assertThat(resultado.get().cpf()).isEqualTo("12345678900");
+        assertThat(resultado.get().nome()).isEqualTo("Lis");
+        assertThat(resultado.get().statusBloqueio()).isEqualTo(StatusBloqueio.A);
+        verify(clienteRepository).findById(1L);
+    }
+
+    @Test
+    void deveRetornarVazioQuandoClienteNaoEncontradoPorId() {
+        when(clienteRepository.findById(1L)).thenReturn(Optional.empty());
+
+        Optional<ClienteResponseDTO> resultado = clienteService.findById(1L);
+
+        assertThat(resultado).isEmpty();
+        verify(clienteRepository).findById(1L);
     }
 
     @Test
@@ -72,7 +89,24 @@ class ClienteServiceTest {
 
         assertThat(atualizado.nome()).isEqualTo("Novo");
         assertThat(atualizado.cpf()).isEqualTo("11111111111");
+        assertThat(atualizado.dataNascimento()).isEqualTo(LocalDate.of(1995, 5, 5));
         assertThat(atualizado.limiteCredito()).isEqualTo(BigDecimal.valueOf(5000.0));
+        assertThat(atualizado.statusBloqueio()).isEqualTo(StatusBloqueio.A); // Status não deve mudar
+        verify(clienteRepository).findById(1L);
+        verify(clienteRepository).save(any(Cliente.class));
+    }
+
+    @Test
+    void deveLancarExcecaoQuandoAtualizarClienteInexistente() {
+        ClienteRequestDTO dto = new ClienteRequestDTO("Novo", "11111111111", LocalDate.of(1995, 5, 5), BigDecimal.valueOf(5000.0));
+
+        when(clienteRepository.findById(1L)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> clienteService.update(1L, dto));
+
+        assertThat(exception.getMessage()).isEqualTo("Cliente não encontrado");
+        verify(clienteRepository).findById(1L);
+        verify(clienteRepository, never()).save(any(Cliente.class));
     }
 
     @Test
@@ -86,6 +120,18 @@ class ClienteServiceTest {
 
         assertThat(lista).hasSize(2);
         assertThat(lista.get(0).nome()).isEqualTo("Lis");
+        assertThat(lista.get(1).nome()).isEqualTo("Ana");
+        verify(clienteRepository).findAll();
+    }
+
+    @Test
+    void deveRetornarListaVaziaQuandoNaoHaClientes() {
+        when(clienteRepository.findAll()).thenReturn(List.of());
+
+        List<ClienteResponseDTO> lista = clienteService.findAll();
+
+        assertThat(lista).isEmpty();
+        verify(clienteRepository).findAll();
     }
 
     @Test
@@ -97,5 +143,17 @@ class ClienteServiceTest {
 
         assertThat(bloqueados).hasSize(1);
         assertThat(bloqueados.get(0).statusBloqueio()).isEqualTo(StatusBloqueio.B);
+        assertThat(bloqueados.get(0).nome()).isEqualTo("Bloqueado");
+        verify(clienteRepository).findByStatusBloqueio(StatusBloqueio.B);
+    }
+
+    @Test
+    void deveRetornarListaVaziaQuandoNaoHaClientesBloqueados() {
+        when(clienteRepository.findByStatusBloqueio(StatusBloqueio.B)).thenReturn(List.of());
+
+        List<ClienteResponseDTO> bloqueados = clienteService.findBlockedClients();
+
+        assertThat(bloqueados).isEmpty();
+        verify(clienteRepository).findByStatusBloqueio(StatusBloqueio.B);
     }
 }
