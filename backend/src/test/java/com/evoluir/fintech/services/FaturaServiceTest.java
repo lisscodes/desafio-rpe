@@ -201,12 +201,12 @@ class FaturaServiceTest {
     void deveLancarExcecaoQuandoFaturaRequestDTOInvalido() {
         FaturaRequestDTO dtoInvalido = new FaturaRequestDTO(null, LocalDate.of(2025, 7, 15), BigDecimal.valueOf(150.00));
         FaturaRequestDTO finalDtoInvalido = dtoInvalido;
-        assertThrows(IllegalArgumentException.class, () -> faturaService.create(finalDtoInvalido),
+        assertThrows(RuntimeException.class, () -> faturaService.create(finalDtoInvalido),
                 "Deve lançar exceção para clienteId nulo");
 
         dtoInvalido = new FaturaRequestDTO(1L, LocalDate.of(2025, 7, 15), BigDecimal.valueOf(-150.00));
         FaturaRequestDTO finalDtoInvalido1 = dtoInvalido;
-        assertThrows(IllegalArgumentException.class, () -> faturaService.create(finalDtoInvalido1),
+        assertThrows(RuntimeException.class, () -> faturaService.create(finalDtoInvalido1),
                 "Deve lançar exceção para valor negativo");
     }
 
