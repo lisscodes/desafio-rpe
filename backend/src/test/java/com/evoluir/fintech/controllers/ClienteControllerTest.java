@@ -5,9 +5,6 @@ import com.evoluir.fintech.domain.dtos.ClienteResponseDTO;
 import com.evoluir.fintech.domain.entities.StatusBloqueio;
 import com.evoluir.fintech.domain.exceptions.CustomExceptionHandler;
 import com.evoluir.fintech.services.ClienteService;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -23,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +68,7 @@ class ClienteControllerTest {
                 "Lis",
                 "12345678900",
                 LocalDate.of(1998, 10, 22),
-                2000.0
+                BigDecimal.valueOf(2000.0)
         );
 
         responseDTO = new ClienteResponseDTO(
@@ -79,7 +77,7 @@ class ClienteControllerTest {
                 "12345678900",
                 LocalDate.of(1998, 10, 22),
                 StatusBloqueio.A,
-                2000.0
+                BigDecimal.valueOf(2000.0)
         );
     }
 
@@ -157,7 +155,7 @@ class ClienteControllerTest {
     @Test
     void deveListarClientesBloqueados() throws Exception {
         ClienteResponseDTO bloqueado = new ClienteResponseDTO(
-                2L, "Ana", "222", LocalDate.now(), StatusBloqueio.B, 0.0
+                2L, "Ana", "222", LocalDate.now(), StatusBloqueio.B, BigDecimal.ZERO
         );
 
         when(clienteService.findBlockedClients()).thenReturn(List.of(bloqueado));
@@ -185,10 +183,10 @@ class ClienteControllerTest {
 
         ClienteRequestDTO dto = mapper.readValue(json, ClienteRequestDTO.class);
 
-        assertNotNull(dto.getNome());
-        assertNotNull(dto.getCpf());
-        assertNotNull(dto.getDataNascimento());
-        assertNotNull(dto.getLimiteCredito());
+        assertNotNull(dto.nome());
+        assertNotNull(dto.cpf());
+        assertNotNull(dto.dataNascimento());
+        assertNotNull(dto.limiteCredito());
     }
 
 }

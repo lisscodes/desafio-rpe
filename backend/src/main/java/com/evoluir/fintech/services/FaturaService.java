@@ -1,5 +1,6 @@
 package com.evoluir.fintech.services;
 
+import com.evoluir.fintech.domain.dtos.FaturaRequestDTO;
 import com.evoluir.fintech.domain.dtos.FaturaResponseDTO;
 import com.evoluir.fintech.domain.entities.Cliente;
 import com.evoluir.fintech.domain.entities.Fatura;
@@ -10,6 +11,7 @@ import com.evoluir.fintech.repositories.FaturaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -19,6 +21,29 @@ public class FaturaService {
 
     private final FaturaRepository faturaRepository;
     private final ClienteRepository clienteRepository;
+
+    public FaturaResponseDTO create(FaturaRequestDTO dto) {
+        Cliente cliente = clienteRepository.findById(dto.clienteId())
+                .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+
+        if (cliente.getStatusBloqueio() == StatusBloqueio.B) {
+            throw new RuntimeException("Não é possível criar fatura para cliente bloqueado");
+        }
+
+        if (dto.valor().compareTo(cliente.getLimiteCredito()) > 0) {
+            throw new RuntimeException("Valor da fatura excede o limite de crédito do cliente");
+        }
+
+        Fatura fatura = Fatura.builder()
+                .cliente(cliente)
+                .dataVencimento(dto.dataVencimento())
+                .valor(dto.valor())
+                .status(StatusFatura.B)
+                .build();
+
+        Fatura saved = faturaRepository.save(fatura);
+        return toDTO(saved);
+    }
 
     public List<FaturaResponseDTO> findByClienteId(Long clienteId) {
         return faturaRepository.findByClienteId(clienteId).stream()
@@ -43,7 +68,7 @@ public class FaturaService {
             Cliente cliente = fatura.getCliente();
             if (cliente.getStatusBloqueio() != StatusBloqueio.B) {
                 cliente.setStatusBloqueio(StatusBloqueio.B);
-                cliente.setLimiteCredito(0.0);
+                cliente.setLimiteCredito(BigDecimal.ZERO);
                 clienteRepository.save(cliente);
             }
         });

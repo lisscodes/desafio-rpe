@@ -30,10 +30,10 @@ public class ClienteService {
 
     public ClienteResponseDTO create(ClienteRequestDTO dto) {
         Cliente novo = new Cliente();
-        novo.setNome(dto.getNome());
-        novo.setCpf(dto.getCpf());
-        novo.setDataNascimento(dto.getDataNascimento());
-        novo.setLimiteCredito(dto.getLimiteCredito());
+        novo.setNome(dto.nome());
+        novo.setCpf(dto.cpf());
+        novo.setDataNascimento(dto.dataNascimento());
+        novo.setLimiteCredito(dto.limiteCredito());
         novo.setStatusBloqueio(StatusBloqueio.A);
         Cliente salvo = clienteRepository.save(novo);
         return toResponseDTO(salvo);
@@ -43,10 +43,10 @@ public class ClienteService {
         Cliente existente = clienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
 
-        existente.setNome(dto.getNome());
-        existente.setCpf(dto.getCpf());
-        existente.setDataNascimento(dto.getDataNascimento());
-        existente.setLimiteCredito(dto.getLimiteCredito());
+        existente.setNome(dto.nome());
+        existente.setCpf(dto.cpf());
+        existente.setDataNascimento(dto.dataNascimento());
+        existente.setLimiteCredito(dto.limiteCredito());
 
         Cliente atualizado = clienteRepository.save(existente);
         return toResponseDTO(atualizado);

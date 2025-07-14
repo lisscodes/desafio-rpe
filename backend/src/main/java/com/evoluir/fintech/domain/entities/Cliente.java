@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Setter
@@ -29,11 +30,11 @@ public class Cliente {
     private StatusBloqueio statusBloqueio = StatusBloqueio.A;
 
     @Column(name = "limite_credito")
-    private Double limiteCredito;
+    private BigDecimal limiteCredito;
 
     public Cliente() {}
 
-    public Cliente(String nome, String cpf, LocalDate dataNascimento, StatusBloqueio statusBloqueio, Double limiteCredito) {
+    public Cliente(String nome, String cpf, LocalDate dataNascimento, StatusBloqueio statusBloqueio, BigDecimal limiteCredito) {
         this.nome = nome;
         this.cpf = cpf;
         this.dataNascimento = dataNascimento;

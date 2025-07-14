@@ -6,51 +6,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class ClienteRequestDTO {
-
-    @NotBlank(message = "Nome é obrigatório")
-    private final String nome;
-
-    @NotBlank(message = "CPF é obrigatório")
-    private final String cpf;
-
-    @NotNull(message = "Data de nascimento é obrigatória")
-    @Past(message = "Data de nascimento deve ser no passado")
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private final LocalDate dataNascimento;
-
-    @NotNull(message = "Limite de crédito é obrigatório")
-    private final Double limiteCredito;
-
-    @JsonCreator
-    public ClienteRequestDTO(
-            @JsonProperty("nome") String nome,
-            @JsonProperty("cpf") String cpf,
-            @JsonProperty("dataNascimento") LocalDate dataNascimento,
-            @JsonProperty("limiteCredito") Double limiteCredito
-    ) {
-        this.nome = nome;
-        this.cpf = cpf;
-        this.dataNascimento = dataNascimento;
-        this.limiteCredito = limiteCredito;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public String getCpf() {
-        return cpf;
-    }
-
-    public LocalDate getDataNascimento() {
-        return dataNascimento;
-    }
-
-    public Double getLimiteCredito() {
-        return limiteCredito;
-    }
+public record ClienteRequestDTO(@NotBlank(message = "Nome é obrigatório") String nome,
+                                @NotBlank(message = "CPF é obrigatório") @Pattern(regexp = "\\d{11}", message = "CPF deve conter 11 dígitos numéricos") String cpf,
+                                @JsonFormat(pattern = "yyyy-MM-dd") @NotNull(message = "Data de nascimento é obrigatória") @Past(message = "Data de nascimento deve ser no passado") LocalDate dataNascimento,
+                                @NotNull(message = "Limite de crédito é obrigatório") @PositiveOrZero(message = "Limite de crédito deve ser maior ou igual a zero") BigDecimal limiteCredito) {
 }

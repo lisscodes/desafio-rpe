@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -25,10 +26,10 @@ class ClienteIntegrationTest {
     void deveSalvarERecuperarCliente() {
         Cliente cliente = new Cliente(
                 "Cliente Integração",
-                "98765432100",
+                "98723465741",
                 LocalDate.of(2000, 1, 1),
                 StatusBloqueio.A,
-                1500.0
+                BigDecimal.valueOf(1500.0)
         );
 
         Cliente salvo = clienteRepository.save(cliente);
@@ -36,7 +37,7 @@ class ClienteIntegrationTest {
         clienteIdToDelete = salvo.getId();
 
         assertThat(salvo.getId()).isNotNull();
-        assertThat(salvo.getCpf()).isEqualTo("98765432100");
+        assertThat(salvo.getCpf()).isEqualTo("98723465741");
 
         Cliente encontrado = clienteRepository.findById(salvo.getId()).orElseThrow();
         assertThat(encontrado.getNome()).isEqualTo("Cliente Integração");

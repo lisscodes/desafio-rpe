@@ -1,5 +1,6 @@
 package com.evoluir.fintech.controllers;
 
+import com.evoluir.fintech.domain.dtos.FaturaRequestDTO;
 import com.evoluir.fintech.domain.dtos.FaturaResponseDTO;
 import com.evoluir.fintech.services.FaturaService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +24,38 @@ import java.util.List;
 public class FaturaController {
 
     private final FaturaService faturaService;
+
+    @Operation(
+            summary = "Cadastrar nova fatura",
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    description = "Dados da fatura para cadastro",
+                    content = @Content(mediaType = "application/json", examples = {
+                            @ExampleObject(name = "Fatura Exemplo", value = """
+                            {
+                              "clienteId": 1,
+                              "dataVencimento": "2025-08-15",
+                              "valor": 150.75
+                            }
+                            """)
+                    })
+            )
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Fatura criada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+    })
+    @PostMapping
+    public ResponseEntity<FaturaResponseDTO> createFatura(
+            @RequestBody @Valid FaturaRequestDTO dto) {
+        try {
+            FaturaResponseDTO created = faturaService.create(dto);
+            return ResponseEntity.ok(created);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(null);
+        }
+    }
 
     @Operation(summary = "Listar faturas de um cliente")
     @ApiResponses({

@@ -1,6 +1,8 @@
 package com.evoluir.fintech.domain.dtos;
 
 import com.evoluir.fintech.domain.entities.StatusBloqueio;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record ClienteResponseDTO(
@@ -9,5 +11,5 @@ public record ClienteResponseDTO(
         String cpf,
         LocalDate dataNascimento,
         StatusBloqueio statusBloqueio,
-        Double limiteCredito
+        BigDecimal limiteCredito
 ) {}

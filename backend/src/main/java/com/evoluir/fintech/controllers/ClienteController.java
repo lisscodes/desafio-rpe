@@ -74,7 +74,7 @@ public class ClienteController {
             @org.springframework.web.bind.annotation.RequestBody @Valid ClienteRequestDTO dto) {
 
         log.info("==> POST /clientes - Dados recebidos: nome={}, cpf={}, dataNascimento={}, limiteCredito={}",
-                dto.getNome(), dto.getCpf(), dto.getDataNascimento(), dto.getLimiteCredito());
+                dto.nome(), dto.cpf(), dto.dataNascimento(), dto.limiteCredito());
 
         ClienteResponseDTO created = clienteService.create(dto);
         return ResponseEntity.ok(created);
@@ -108,7 +108,7 @@ public class ClienteController {
             @org.springframework.web.bind.annotation.RequestBody @Valid ClienteRequestDTO dto) {
 
         log.info("==> PUT /clientes/{} - Dados recebidos: nome={}, cpf={}, dataNascimento={}, limiteCredito={}",
-                id, dto.getNome(), dto.getCpf(), dto.getDataNascimento(), dto.getLimiteCredito());
+                id, dto.nome(), dto.cpf(), dto.dataNascimento(), dto.limiteCredito());
 
         try {
             ClienteResponseDTO updated = clienteService.update(id, dto);
