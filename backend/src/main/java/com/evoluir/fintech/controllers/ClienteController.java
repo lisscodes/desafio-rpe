@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,7 +50,7 @@ public class ClienteController {
 
     @Operation(
             summary = "Cadastrar novo cliente",
-            requestBody = @RequestBody(
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
                     description = "Dados do cliente para cadastro",
                     content = @Content(mediaType = "application/json", examples = {
@@ -72,7 +71,7 @@ public class ClienteController {
     })
     @PostMapping
     public ResponseEntity<ClienteResponseDTO> createClient(
-            @RequestBody @Valid ClienteRequestDTO dto) {
+            @org.springframework.web.bind.annotation.RequestBody @Valid ClienteRequestDTO dto) {
 
         log.info("==> POST /clientes - Dados recebidos: nome={}, cpf={}, dataNascimento={}, limiteCredito={}",
                 dto.getNome(), dto.getCpf(), dto.getDataNascimento(), dto.getLimiteCredito());
@@ -83,7 +82,7 @@ public class ClienteController {
 
     @Operation(
             summary = "Atualizar dados de um cliente",
-            requestBody = @RequestBody(
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
                     description = "Dados atualizados do cliente",
                     content = @Content(mediaType = "application/json", examples = {
@@ -106,7 +105,7 @@ public class ClienteController {
     public ResponseEntity<ClienteResponseDTO> updateClient(
             @Parameter(description = "ID do cliente", example = "1")
             @PathVariable Long id,
-            @RequestBody @Valid ClienteRequestDTO dto) {
+            @org.springframework.web.bind.annotation.RequestBody @Valid ClienteRequestDTO dto) {
 
         log.info("==> PUT /clientes/{} - Dados recebidos: nome={}, cpf={}, dataNascimento={}, limiteCredito={}",
                 id, dto.getNome(), dto.getCpf(), dto.getDataNascimento(), dto.getLimiteCredito());
