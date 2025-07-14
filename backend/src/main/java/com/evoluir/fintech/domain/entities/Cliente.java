@@ -1,0 +1,44 @@
+package com.evoluir.fintech.domain.entities;
+
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDate;
+
+@Setter
+@Getter
+@Entity
+@Table(name = "clientes")
+public class Cliente {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String nome;
+
+    @Column(nullable = false, unique = true)
+    private String cpf;
+
+    @Column(name = "data_nascimento")
+    private LocalDate dataNascimento;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status_bloqueio", nullable = false)
+    private StatusBloqueio statusBloqueio = StatusBloqueio.A;
+
+    @Column(name = "limite_credito")
+    private Double limiteCredito;
+
+    public Cliente() {}
+
+    public Cliente(String nome, String cpf, LocalDate dataNascimento, StatusBloqueio statusBloqueio, Double limiteCredito) {
+        this.nome = nome;
+        this.cpf = cpf;
+        this.dataNascimento = dataNascimento;
+        this.statusBloqueio = statusBloqueio;
+        this.limiteCredito = limiteCredito;
+    }
+
+}
