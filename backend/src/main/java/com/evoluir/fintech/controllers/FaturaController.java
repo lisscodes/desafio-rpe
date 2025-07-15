@@ -32,19 +32,20 @@ public class FaturaController {
                     description = "Dados da fatura para cadastro",
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(name = "Fatura Exemplo", value = """
-                            {
-                              "clienteId": 1,
-                              "dataVencimento": "2025-08-15",
-                              "valor": 150.75
-                            }
-                            """)
+                                    {
+                                      "clienteId": 1,
+                                      "dataVencimento": "2025-08-15",
+                                      "valor": 150.75
+                                    }
+                                    """)
                     })
             )
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Fatura criada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos"),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+            @ApiResponse(responseCode = "400", description = "Dados inválidos, como clienteId nulo ou valor negativo"),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado"),
+            @ApiResponse(responseCode = "422", description = "Cliente bloqueado ou valor excede limite de crédito")
     })
     @PostMapping
     public ResponseEntity<FaturaResponseDTO> createFatura(
@@ -77,15 +78,15 @@ public class FaturaController {
                     description = "Esse endpoint não exige corpo, mas o exemplo a seguir mostra uma possível estrutura de fatura.",
                     content = @Content(mediaType = "application/json", examples = {
                             @ExampleObject(name = "Fatura Exemplo", value = """
-                    {
-                      "id": 1,
-                      "clienteId": 1,
-                      "dataVencimento": "2024-07-15",
-                      "dataPagamento": null,
-                      "valor": 120.75,
-                      "status": "B"
-                    }
-                """)
+                                        {
+                                          "id": 1,
+                                          "clienteId": 1,
+                                          "dataVencimento": "2024-07-15",
+                                          "dataPagamento": null,
+                                          "valor": 120.75,
+                                          "status": "B"
+                                        }
+                                    """)
                     })
             )
     )
