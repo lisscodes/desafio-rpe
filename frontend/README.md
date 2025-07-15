@@ -1,7 +1,7 @@
 # Gestão de Clientes RPE
 
 Bem-vindo ao projeto **Gestão de Clientes RPE**!  
-Este sistema foi desenvolvido como parte do processo seletivo da RPE para a vaga de estagiário fullstack. Se trata de uma aplicação para simular a gestão de clientes, faturas e pagamentos em uma interface web. A aplicação oferece visualização de clientes cadastrados, consulta de faturas individuais e registro de pagamentos de forma interativa.
+Este sistema foi desenvolvido como parte do processo seletivo da RPE para a vaga de estagiário fullstack. Trata-se de uma aplicação para simular a gestão de clientes, faturas e pagamentos em uma interface web. A aplicação oferece visualização de clientes cadastrados, consulta de faturas individuais e registro de pagamentos de forma interativa.
 
 ---
 
@@ -71,6 +71,7 @@ npm start
 
 O projeto será executado em: [http://localhost:3000](http://localhost:3000)
 
+
 ---
 
 ## Build de Produção
@@ -92,3 +93,11 @@ src/
 ├── App.tsx               # Definição central das rotas
 └── index.tsx             # Ponto de entrada da aplicação
 ```
+
+---
+
+## Observações sobre a busca de clientes
+
+* A pesquisa de clientes é feita **pelo ID do cliente**.
+* Os IDs seguem a **ordem de cadastro**: o primeiro cliente tem `id = 1`, o segundo `id = 2` e assim por diante.
+
