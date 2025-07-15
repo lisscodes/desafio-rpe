@@ -40,7 +40,7 @@ cd desafio-rpe
 ### 2. Execute via Docker Compose
 
 ```bash
-docker-compose up --build
+docker-compose up --build -d
 ```
 
 Isso irá:
