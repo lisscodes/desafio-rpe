@@ -42,7 +42,7 @@ const HomePage = () => {
         <div className="grid grid-cols-4 gap-4">
           <div
             className="relative cursor-pointer group"
-            onClick={() => navigate('')}
+            onClick={() => navigate('/clients/new')}
           >
             <img
               src="/assets/novos-clientes.png"
