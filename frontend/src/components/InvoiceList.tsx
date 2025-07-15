@@ -1,36 +1,30 @@
-import React from 'react';
-
-interface Fatura {
-  id: number;
-  valor: number;
-  dataVencimento: string;
-  dataPagamento?: string;
-  status: 'Pendente' | 'Pago' | 'Atrasada';
-}
+import React, { useEffect, useState } from 'react';
+import { Fatura } from '../models/Invoice';
+import { faturaService } from '../services/InvoiceService';
 
 interface Props {
   clienteId?: string;
 }
 
-const faturasPorCliente: Record<string, Fatura[]> = {
-  '1': [
-    { id: 1, valor: 1200.5, dataVencimento: '2025-07-01', status: 'Pago', dataPagamento: '2025-07-01' },
-    { id: 2, valor: 750.0, dataVencimento: '2025-07-10', status: 'Pendente' },
-  ],
-  '2': [
-    { id: 3, valor: 350.0, dataVencimento: '2025-07-03', status: 'Atrasada' },
-  ],
-  '3': [],
-  '4': [
-    { id: 4, valor: 199.9, dataVencimento: '2025-07-11', status: 'Pendente' },
-  ],
-};
-
 const InvoiceList: React.FC<Props> = ({ clienteId }) => {
-  const faturas = faturasPorCliente[clienteId ?? ''] || [];
+  const [faturas, setFaturas] = useState<Fatura[]>([]);
 
-  const handlePagamento = (faturaId: number) => {
-    alert(`Simulando pagamento da fatura #${faturaId}`);
+  useEffect(() => {
+    if (clienteId) {
+      faturaService.listarPorCliente(clienteId)
+        .then(setFaturas)
+        .catch(err => console.error('Erro ao buscar faturas:', err));
+    }
+  }, [clienteId]);
+
+  const handlePagamento = (id: number) => {
+    faturaService.registrarPagamento(id)
+      .then(faturaAtualizada => {
+        setFaturas(prev =>
+          prev.map(f => f.id === id ? faturaAtualizada : f)
+        );
+      })
+      .catch(err => console.error('Erro ao registrar pagamento:', err));
   };
 
   return (
@@ -48,25 +42,23 @@ const InvoiceList: React.FC<Props> = ({ clienteId }) => {
             </tr>
           </thead>
           <tbody>
-            {faturas.map((f) => (
+            {faturas.map(f => (
               <tr key={f.id} className="border-t">
                 <td className="p-2">R$ {f.valor.toFixed(2)}</td>
                 <td className="p-2">{f.dataVencimento}</td>
                 <td className="p-2">
-                  <span
-                    className={`px-2 py-1 rounded ${
-                      f.status === 'Pago'
-                        ? 'bg-green-100 text-green-800'
-                        : f.status === 'Pendente'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}
-                  >
+                  <span className={`px-2 py-1 rounded ${
+                    f.status === 'Paga'
+                      ? 'bg-green-100 text-green-800'
+                      : f.status === 'Aberta'
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}>
                     {f.status}
                   </span>
                 </td>
                 <td className="p-2">
-                  {f.status === 'Pago' ? (
+                  {f.status === 'Paga' ? (
                     f.dataPagamento
                   ) : (
                     <button
