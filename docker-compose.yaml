@@ -12,6 +12,46 @@ services:
       - db_data:/var/lib/postgresql/data
       - ./backend/database/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
     restart: unless-stopped
+    networks:
+      - fintech-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fintech_backend
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/fintech
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JACKSON_MAPPER_ACCEPT_CASE_INSENSITIVE_PROPERTIES=true
+      - SPRING_JACKSON_DATE_FORMAT=yyyy-MM-dd
+      - SPRING_JACKSON_SERIALIZATION_WRITE_DATES_AS_TIMESTAMPS=false
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - fintech-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: fintech_frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - fintech-network
+
+networks:
+  fintech-network:
+    driver: bridge
 
 volumes:
   db_data:

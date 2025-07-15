@@ -5,8 +5,6 @@ import com.evoluir.fintech.domain.dtos.FaturaResponseDTO;
 import com.evoluir.fintech.services.FaturaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,35 +15,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Faturas", description = "Operações relacionadas às faturas dos clientes.")
 @RestController
 @RequestMapping("/faturas")
 @RequiredArgsConstructor
+@Tag(name = "Faturas", description = "Endpoints para gerenciamento de faturas")
 public class FaturaController {
 
     private final FaturaService faturaService;
 
-    @Operation(
-            summary = "Cadastrar nova fatura",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    required = true,
-                    description = "Dados da fatura para cadastro",
-                    content = @Content(mediaType = "application/json", examples = {
-                            @ExampleObject(name = "Fatura Exemplo", value = """
-                                    {
-                                      "clienteId": 1,
-                                      "dataVencimento": "2025-08-15",
-                                      "valor": 150.75
-                                    }
-                                    """)
-                    })
-            )
-    )
-    @ApiResponses({
+    @Operation(summary = "Criar nova fatura", description = "Cria uma nova fatura com base nos dados fornecidos")
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fatura criada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Dados inválidos, como clienteId nulo ou valor negativo"),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado"),
-            @ApiResponse(responseCode = "422", description = "Cliente bloqueado ou valor excede limite de crédito")
+            @ApiResponse(responseCode = "400", description = "Dados de entrada inválidos ou cliente bloqueado"),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
     })
     @PostMapping
     public ResponseEntity<FaturaResponseDTO> createFatura(
@@ -58,46 +40,24 @@ public class FaturaController {
         }
     }
 
-    @Operation(summary = "Listar faturas de um cliente")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Faturas encontradas"),
-            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+    @Operation(summary = "Listar faturas por cliente", description = "Retorna todas as faturas de um cliente específico pelo ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de faturas retornada com sucesso")
     })
     @GetMapping("/{id}")
     public ResponseEntity<List<FaturaResponseDTO>> getFaturasByClienteId(
-            @Parameter(description = "ID do cliente", example = "1")
-            @PathVariable Long id) {
+            @Parameter(description = "ID do cliente para listar as faturas") @PathVariable Long id) {
         return ResponseEntity.ok(faturaService.findByClienteId(id));
     }
 
-    @Operation(
-            summary = "Registrar pagamento de uma fatura",
-            description = "Ao registrar o pagamento, a fatura será marcada como 'Paga' e a data de pagamento será preenchida com a data atual.",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    required = false,
-                    description = "Esse endpoint não exige corpo, mas o exemplo a seguir mostra uma possível estrutura de fatura.",
-                    content = @Content(mediaType = "application/json", examples = {
-                            @ExampleObject(name = "Fatura Exemplo", value = """
-                                        {
-                                          "id": 1,
-                                          "clienteId": 1,
-                                          "dataVencimento": "2024-07-15",
-                                          "dataPagamento": null,
-                                          "valor": 120.75,
-                                          "status": "B"
-                                        }
-                                    """)
-                    })
-            )
-    )
-    @ApiResponses({
+    @Operation(summary = "Registrar pagamento de fatura", description = "Registra o pagamento de uma fatura pelo ID")
+    @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Pagamento registrado com sucesso"),
             @ApiResponse(responseCode = "404", description = "Fatura não encontrada")
     })
     @PutMapping("/{id}/pagamento")
     public ResponseEntity<FaturaResponseDTO> registrarPagamento(
-            @Parameter(description = "ID da fatura", example = "1")
-            @PathVariable Long id) {
+            @Parameter(description = "ID da fatura para registrar pagamento") @PathVariable Long id) {
         try {
             return ResponseEntity.ok(faturaService.registrarPagamento(id));
         } catch (RuntimeException e) {
@@ -105,8 +65,10 @@ public class FaturaController {
         }
     }
 
-    @Operation(summary = "Listar faturas em atraso")
-    @ApiResponse(responseCode = "200", description = "Faturas em atraso retornadas")
+    @Operation(summary = "Listar faturas atrasadas", description = "Retorna todas as faturas atrasadas e atualiza o status do cliente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista de faturas atrasadas retornada com sucesso")
+    })
     @GetMapping("/atrasadas")
     public ResponseEntity<List<FaturaResponseDTO>> getFaturasAtrasadas() {
         return ResponseEntity.ok(faturaService.findFaturasAtrasadas());
