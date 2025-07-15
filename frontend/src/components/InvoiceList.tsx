@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Fatura } from '../models/Invoice';
+import { Invoice } from '../models/Invoice';
 import { faturaService } from '../services/InvoiceService';
 
 interface Props {
@@ -7,7 +7,7 @@ interface Props {
 }
 
 const InvoiceList: React.FC<Props> = ({ clienteId }) => {
-  const [faturas, setFaturas] = useState<Fatura[]>([]);
+  const [faturas, setFaturas] = useState<Invoice[]>([]);
 
   useEffect(() => {
     if (clienteId) {
