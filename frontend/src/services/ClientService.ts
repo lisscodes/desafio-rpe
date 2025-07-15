@@ -18,4 +18,14 @@ export const clientService = {
     const response = await axios.get<Client[]>(`${API_URL}/bloqueados`);
     return response.data;
   },
+
+  async criar(novoCliente: {
+  nome: string;
+  cpf: string;
+  dataNascimento: string;
+  limiteCredito: number;
+}): Promise<Client> {
+  const response = await axios.post<Client>(API_URL, novoCliente);
+  return response.data;
+}
 };
