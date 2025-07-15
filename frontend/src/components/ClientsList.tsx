@@ -5,7 +5,7 @@ type Cliente = {
   nome: string;
   cpf: string;
   idade: number;
-  bloqueado: boolean;
+  statusBloqueio: string;
   limiteCredito: number;
 };
 
@@ -34,7 +34,7 @@ const ClientesList: React.FC<ClientesListProps> = ({ clientes, onVerFaturas }) =
               <td className="p-2 border">{cliente.nome}</td>
               <td className="p-2 border">{cliente.cpf}</td>
               <td className="p-2 border">{cliente.idade}</td>
-              <td className="p-2 border">{cliente.bloqueado ? 'Sim' : 'Não'}</td>
+              <td className="p-2 border">{cliente.statusBloqueio == 'A' ? 'Sim':'Não'}</td>
               <td className="p-2 border">R$ {cliente.limiteCredito.toLocaleString()}</td>
               <td className="p-2 border">
                 <button

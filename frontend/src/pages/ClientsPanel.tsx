@@ -1,19 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ClientsList from '../components/ClientsList';
+import { Cliente } from '../models/Client';
+import { clienteService } from '../services/ClientService';
 
-const clientes = [
-  { id: 1, nome: 'José Silva', cpf: '123.456.789-09', idade: 45, bloqueado: false, limiteCredito: 5000 },
-  { id: 2, nome: 'Ana Souza', cpf: '987.654.821-01', idade: 38, bloqueado: false, limiteCredito: 10000 },
-  { id: 3, nome: 'Carlos Lima', cpf: '111.222.333-44', idade: 51, bloqueado: true, limiteCredito: 7500 },
-  { id: 4, nome: 'Marta Alves', cpf: '222.333.444-55', idade: 29, bloqueado: false, limiteCredito: 3000 },
-];
-
-const PainelDeClientes = () => {
+const ClientsPanel = () => {
+  const [clientes, setClientes] = useState<Cliente[]>([]);
   const navigate = useNavigate();
 
-  const handleVerFaturas = (clienteId: number) => {
-    navigate(`/invoices/${clienteId}`);
+  useEffect(() => {
+    clienteService.listarTodos()
+      .then(setClientes)
+      .catch(err => console.error('Erro ao buscar clientes:', err));
+  }, []);
+
+  const handleVerFaturas = (id: number) => {
+    navigate(`/invoices/${id}`);
   };
 
   return (
@@ -24,4 +26,4 @@ const PainelDeClientes = () => {
   );
 };
 
-export default PainelDeClientes;
+export default ClientsPanel;
