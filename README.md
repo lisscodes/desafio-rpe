@@ -49,6 +49,12 @@ Isso irá:
 * Subir o backend Java na porta `8080`
 * Subir o frontend React na porta `3000`
 
+Após a execução, basta abrir o navegador e acessar:
+
+http://localhost:3000 – para usar a aplicação
+
+http://localhost:8080/swagger-ui.html – para acessar a API
+
 ---
 
 ## Regras de Negócio e Status das Faturas
@@ -85,9 +91,3 @@ backend/target/site/jacoco/index.html
 ```
 
 ---
-
-## Documentação da API
-
-Ao executar o backend, a documentação Swagger estará disponível em:
-
-📎 [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
